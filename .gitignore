@@ -1,4 +1,3 @@
 node_modules/
-almoxarifado.db
-almoxarifado.db-*
+data/almoxarifado.json
 *.log
