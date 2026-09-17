@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Almoxarifado Online</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <h2>Almoxarifado</h2>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#" class="active" data-page="dashboard">Dashboard</a></li>
+      <li><a href="#" data-page="produtos">Produtos</a></li>
+      <li><a href="#" data-page="empresas">Empresas</a></li>
+      <li><a href="#" data-page="movimentacoes">Movimentacoes</a></li>
+    </ul>
+  </nav>
+
+  <main class="content">
+    <!-- DASHBOARD -->
+    <section id="page-dashboard" class="page active">
+      <h1>Dashboard</h1>
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-number" id="stat-produtos">0</div>
+          <div class="stat-label">Total de Produtos</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-number" id="stat-estoque">0</div>
+          <div class="stat-label">Itens em Estoque</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-number" id="stat-empresas">0</div>
+          <div class="stat-label">Empresas Cadastradas</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-number" id="stat-valor">R$ 0,00</div>
+          <div class="stat-label">Valor Total em Estoque</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="card">
+          <h3>Produtos que Mais Saem</h3>
+          <table>
+            <thead><tr><th>Codigo</th><th>Produto</th><th>Estoque</th><th>Total Saidas</th></tr></thead>
+            <tbody id="top-saidas"></tbody>
+          </table>
+          <p class="empty-msg" id="empty-saidas">Nenhuma saida registrada</p>
+        </div>
+        <div class="card">
+          <h3>Produtos que Mais Entram</h3>
+          <table>
+            <thead><tr><th>Codigo</th><th>Produto</th><th>Estoque</th><th>Total Entradas</th></tr></thead>
+            <tbody id="top-entradas"></tbody>
+          </table>
+          <p class="empty-msg" id="empty-entradas">Nenhuma entrada registrada</p>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="card">
+          <h3>Estoque Baixo</h3>
+          <table>
+            <thead><tr><th>Codigo</th><th>Produto</th><th>Atual</th><th>Minimo</th></tr></thead>
+            <tbody id="estoque-baixo"></tbody>
+          </table>
+          <p class="empty-msg" id="empty-baixos">Todos os produtos estao com estoque adequado</p>
+        </div>
+        <div class="card">
+          <h3>Ultimas Movimentacoes</h3>
+          <table>
+            <thead><tr><th>Data</th><th>Tipo</th><th>Produto</th><th>Qtd</th></tr></thead>
+            <tbody id="ultimas-movs"></tbody>
+          </table>
+          <p class="empty-msg" id="empty-movs">Nenhuma movimentacao registrada</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUTOS -->
+    <section id="page-produtos" class="page">
+      <div class="page-header">
+        <h1>Produtos</h1>
+        <button class="btn btn-primary" onclick="showModal('produto')">+ Novo Produto</button>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="search-produtos" placeholder="Buscar produto por nome ou codigo..." oninput="filtrarProdutos()">
+      </div>
+      <table>
+        <thead>
+          <tr><th>Codigo</th><th>Nome</th><th>Empresa</th><th>NCM</th><th>Preco Compra</th><th>Preco Venda</th><th>Estoque</th><th>Minimo</th><th>Acoes</th></tr>
+        </thead>
+        <tbody id="lista-produtos"></tbody>
+      </table>
+      <p class="empty-msg" id="empty-produtos">Nenhum produto cadastrado</p>
+    </section>
+
+    <!-- EMPRESAS -->
+    <section id="page-empresas" class="page">
+      <div class="page-header">
+        <h1>Empresas</h1>
+        <button class="btn btn-primary" onclick="showModal('empresa')">+ Nova Empresa</button>
+      </div>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Nome</th><th>CNPJ</th><th>Telefone</th><th>Endereco</th><th>Acoes</th></tr>
+        </thead>
+        <tbody id="lista-empresas"></tbody>
+      </table>
+      <p class="empty-msg" id="empty-empresas">Nenhuma empresa cadastrada</p>
+    </section>
+
+    <!-- MOVIMENTACOES -->
+    <section id="page-movimentacoes" class="page">
+      <div class="page-header">
+        <h1>Movimentacoes</h1>
+        <button class="btn btn-primary" onclick="showModal('movimentacao')">+ Nova Movimentacao</button>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="search-movs" placeholder="Buscar movimentacao..." oninput="filtrarMovimentacoes()">
+      </div>
+      <table>
+        <thead>
+          <tr><th>Data</th><th>Tipo</th><th>Codigo</th><th>Produto</th><th>Quantidade</th><th>Motivo</th></tr>
+        </thead>
+        <tbody id="lista-movimentacoes"></tbody>
+      </table>
+      <p class="empty-msg" id="empty-movimentacoes">Nenhuma movimentacao registrada</p>
+    </section>
+  </main>
+
+  <!-- MODAL PRODUTO -->
+  <div id="modal-produto" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-produto-title">Novo Produto</h2>
+        <button class="btn-close" onclick="closeModal('produto')">&times;</button>
+      </div>
+      <form id="form-produto" onsubmit="salvarProduto(event)">
+        <input type="hidden" id="produto-id">
+        <div class="form-group">
+          <label>Codigo *</label>
+          <input type="text" id="produto-codigo" required>
+        </div>
+        <div class="form-group">
+          <label>Nome *</label>
+          <input type="text" id="produto-nome" required>
+        </div>
+        <div class="form-group">
+          <label>Descricao</label>
+          <input type="text" id="produto-descricao">
+        </div>
+        <div class="form-group">
+          <label>NCM</label>
+          <input type="text" id="produto-ncm" placeholder="Ex: 8476.90.00">
+        </div>
+        <div class="form-group">
+          <label>Empresa</label>
+          <select id="produto-empresa"><option value="">Selecione...</option></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Preco de Compra</label>
+            <input type="number" step="0.01" id="produto-preco-compra" value="0">
+          </div>
+          <div class="form-group">
+            <label>Preco de Venda</label>
+            <input type="number" step="0.01" id="produto-preco-venda" value="0">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Quantidade em Estoque</label>
+            <input type="number" id="produto-quantidade" value="0">
+          </div>
+          <div class="form-group">
+            <label>Estoque Minimo</label>
+            <input type="number" id="produto-minimo" value="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Unidade</label>
+          <select id="produto-unidade">
+            <option value="UN">Unidade (UN)</option>
+            <option value="KG">Quilograma (KG)</option>
+            <option value="L">Litro (L)</option>
+            <option value="M">Metro (M)</option>
+            <option value="M2">Metro Quadrado (M2)</option>
+            <option value="M3">Metro Cubico (M3)</option>
+            <option value="CX">Caixa (CX)</option>
+            <option value="PCT">Pacote (PCT)</option>
+            <option value="PAR">Par (PAR)</option>
+            <option value="DZ">Duzia (DZ)</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('produto')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL EMPRESA -->
+  <div id="modal-empresa" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Nova Empresa</h2>
+        <button class="btn-close" onclick="closeModal('empresa')">&times;</button>
+      </div>
+      <form id="form-empresa" onsubmit="salvarEmpresa(event)">
+        <div class="form-group">
+          <label>Nome *</label>
+          <input type="text" id="empresa-nome" required>
+        </div>
+        <div class="form-group">
+          <label>CNPJ</label>
+          <input type="text" id="empresa-cnpj" placeholder="XX.XXX.XXX/XXXX-XX">
+        </div>
+        <div class="form-group">
+          <label>Telefone</label>
+          <input type="text" id="empresa-telefone" placeholder="(XX) XXXXX-XXXX">
+        </div>
+        <div class="form-group">
+          <label>Endereco</label>
+          <input type="text" id="empresa-endereco">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('empresa')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL MOVIMENTACAO -->
+  <div id="modal-movimentacao" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Nova Movimentacao</h2>
+        <button class="btn-close" onclick="closeModal('movimentacao')">&times;</button>
+      </div>
+      <form id="form-movimentacao" onsubmit="salvarMovimentacao(event)">
+        <div class="form-group">
+          <label>Produto *</label>
+          <select id="mov-produto" required><option value="">Selecione...</option></select>
+        </div>
+        <div class="form-group">
+          <label>Tipo *</label>
+          <select id="mov-tipo" required>
+            <option value="entrada">Entrada</option>
+            <option value="saida">Saida</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Quantidade *</label>
+          <input type="number" id="mov-quantidade" min="1" required>
+        </div>
+        <div class="form-group">
+          <label>Motivo</label>
+          <input type="text" id="mov-motivo" placeholder="Ex: Compra, Devolucao, Transferencia...">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('movimentacao')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
